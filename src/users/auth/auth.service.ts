@@ -5,6 +5,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { CookieOptions } from 'express';
 import { UsersService } from '../users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../dtos/create-user.dto';
@@ -15,17 +16,35 @@ import { MailService } from 'src/mail/mail.service';
 import * as crypto from 'crypto';
 import { ResetUserPasswordDto } from '../dtos/reset-password.dto';
 import { UpdateUserPasswordDto } from '../dtos/update-password.dto';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UsersService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private configService: ConfigService,
   ) {}
+
+  // async generateTokenAndSetCookie(user: any, res: Response) {
+  //   const token = await this.jwtService.signAsync({ id: user._id });
+  //   const cookieOptions: CookieOptions = {
+  //     expires: new Date(
+  //       Date.now() +
+  //         this.configService.get('JWT_COOKIE_EXPIRES_IN') * 24 * 60 * 60 * 1000,
+  //     ),
+  //     httpOnly: true,
+  //   };
+  //   if (this.configService.get('NODE_ENV') === 'production')
+  //     cookieOptions.secure = true;
+
+  //   res.cookie('jwt', token, cookieOptions);
+  //   return token;
+  // }
 
   async signup(dto: CreateUserDto) {
     const user = await this.userService.createUser(dto);
-
     const token = await this.jwtService.signAsync({ id: user._id });
 
     return {
@@ -58,8 +77,6 @@ export class AuthService {
 
     // 3) Send it to user's email
     const resetURL = `${protocol}://${host}/api/v1/users/resetPassword/${resetToken}`;
-
-    const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 
     try {
       await this.mailService.sendPasswordReset(user, resetURL);

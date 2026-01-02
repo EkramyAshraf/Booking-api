@@ -16,6 +16,9 @@ export class User {
   })
   name: string;
 
+  @Prop({ default: true, select: false })
+  active: boolean;
+
   @Prop({
     required: true,
     lowercase: true,
@@ -98,3 +101,8 @@ UserSchema.methods.createPasswordResetToken = function () {
 
   return resetToken;
 };
+
+UserSchema.pre(/^find/, function (this: any) {
+  // this points to the current query
+  this.find({ active: { $ne: false } });
+});

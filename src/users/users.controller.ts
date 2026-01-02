@@ -1,10 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
+  HttpCode,
   Param,
   Patch,
   Post,
   Req,
+  Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -22,6 +25,7 @@ import { User } from './schemas/user.schema';
 import { CurrentUser } from './auth/decorators/currentUser.decorator';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
+import { SetCookieInterceptor } from 'src/interceptors/set-cookie.interceptor';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -30,6 +34,7 @@ export class UsersController {
     private userService: UsersService,
   ) {}
 
+  @UseInterceptors(SetCookieInterceptor)
   @Serialize(UserDto)
   @Post('/signup')
   async signup(@Body() body: CreateUserDto) {
@@ -78,5 +83,12 @@ export class UsersController {
   @Serialize(UserDto)
   async updateMe(@CurrentUser() user: any, @Body() body: UpdateUserDto) {
     return await this.userService.updateMe(body, user.id);
+  }
+
+  @Delete('/deleteMe')
+  @UseGuards(AuthGuard)
+  @HttpCode(204)
+  async deleteMe(@CurrentUser() user: any) {
+    return await this.userService.deleteMe(user.id);
   }
 }

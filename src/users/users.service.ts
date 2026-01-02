@@ -46,4 +46,13 @@ export class UsersService {
       ...user?.toObject(),
     };
   }
+
+  async deleteMe(id: string) {
+    await this.userModel.findByIdAndUpdate(id, { active: false });
+
+    return {
+      status: 'success',
+      data: null,
+    };
+  }
 }
