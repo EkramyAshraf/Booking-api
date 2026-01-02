@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -44,6 +45,7 @@ export class UsersController {
 
   @Serialize(UserDto)
   @Post('/login')
+  @HttpCode(HttpStatus.OK)
   async login(@Body() body: SigninDto) {
     const { user, token } = await this.authService.login(body);
     return { ...user.toObject(), token };

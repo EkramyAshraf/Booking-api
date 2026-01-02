@@ -44,7 +44,7 @@ export class User {
     },
     select: false,
   })
-  passwordConfirm?: string;
+  passwordConfirm: string;
 
   @Prop()
   passwordChangedAt: Date;
@@ -73,7 +73,7 @@ UserSchema.pre('save', async function (this: UserDocument) {
   //hash the password with cost 12
   this.password = await bcrypt.hash(this.password, 12);
   //delete passwordConfirm
-  this.passwordConfirm = undefined;
+  this.set('passwordConfirm', undefined);
 });
 
 UserSchema.methods.changedPasswordAfter = function (jwtTimestamp: number) {
