@@ -10,8 +10,16 @@ import {
   IsEnum,
   IsArray,
   IsDate,
-  ValidateIf,
+  ValidateNested,
 } from 'class-validator';
+import { StartLocationDto, LocationDto } from './geo-locations.dto';
+
+enum Difficulty {
+  EASY = 'easy',
+  MEDIUM = 'medium',
+  DIFFICULT = 'difficult',
+}
+
 export class CreateTourDto {
   @IsString()
   @MaxLength(40)
@@ -29,10 +37,10 @@ export class CreateTourDto {
 
   @IsOptional()
   @IsNumber()
-  priceDiscount: number;
+  priceDiscount?: number;
 
-  @IsNumber()
   @IsOptional()
+  @IsNumber()
   ratingsQuantity: number;
 
   @IsNumber()
@@ -42,10 +50,8 @@ export class CreateTourDto {
   maxGroupSize: number;
 
   @IsString()
-  @IsEnum(['easy', 'medium', 'difficult'], {
-    message: 'Difficulty must be either: easy, medium, or difficult',
-  })
-  difficulty: string;
+  @IsEnum(Difficulty)
+  difficulty: Difficulty;
 
   @IsString()
   summary: string;
@@ -67,4 +73,20 @@ export class CreateTourDto {
   @Type(() => Date)
   @IsDate({ each: true })
   startDates: Date[];
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => StartLocationDto)
+  startLocation?: StartLocationDto;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => LocationDto)
+  locations?: LocationDto[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  guides?: string[];
 }

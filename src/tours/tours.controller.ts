@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ToursService } from './tours.service';
 import { CreateTourDto } from './dtos/create-tour.dto';
-import { UpdateToursDto } from './dtos/update-tour.dto';
+import { UpdateTourDto } from './dtos/update-tour.dto';
 import { AuthGuard } from '../users/auth/guards/auth.guard';
 import { Roles } from 'src/users/auth/decorators/roles.decorator';
 import { RoleGuards } from 'src/users/auth/guards/roles.guard';
@@ -74,7 +74,7 @@ export class ToursController {
   }
 
   @Patch('/:id')
-  async updateTour(@Param('id') id: string, @Body() body: UpdateToursDto) {
+  async updateTour(@Param('id') id: string, @Body() body: UpdateTourDto) {
     const tour = await this.toursService.updateTour(id, body);
     return {
       status: 'success',

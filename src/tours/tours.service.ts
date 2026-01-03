@@ -5,8 +5,9 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Tour, TourDocument } from './schemas/tour.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ApiFeatures } from '../utils/api-features';
+import { CreateTourDto } from './dtos/create-tour.dto';
 
 @Injectable()
 export class ToursService {
@@ -26,11 +27,13 @@ export class ToursService {
     if (tour.priceDiscount !== undefined && tour.priceDiscount >= tour.price) {
       throw new BadRequestException('price must be greater than priceDiscount');
     }
-    return tour.save();
+    return tour;
   }
 
   async getTour(id: string): Promise<TourDocument> {
-    const tour = await this.tourModel.findById(id);
+    const tour = await this.tourModel
+      .findById(id)
+      .populate({ path: 'guides', select: 'name email role' });
     if (!tour) {
       throw new NotFoundException('tour is not found with this id');
     }

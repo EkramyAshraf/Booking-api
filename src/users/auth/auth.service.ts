@@ -24,24 +24,7 @@ export class AuthService {
     private userService: UsersService,
     private jwtService: JwtService,
     private mailService: MailService,
-    private configService: ConfigService,
   ) {}
-
-  // async generateTokenAndSetCookie(user: any, res: Response) {
-  //   const token = await this.jwtService.signAsync({ id: user._id });
-  //   const cookieOptions: CookieOptions = {
-  //     expires: new Date(
-  //       Date.now() +
-  //         this.configService.get('JWT_COOKIE_EXPIRES_IN') * 24 * 60 * 60 * 1000,
-  //     ),
-  //     httpOnly: true,
-  //   };
-  //   if (this.configService.get('NODE_ENV') === 'production')
-  //     cookieOptions.secure = true;
-
-  //   res.cookie('jwt', token, cookieOptions);
-  //   return token;
-  // }
 
   async signup(dto: CreateUserDto) {
     const user = await this.userService.createUser(dto);

@@ -4,12 +4,10 @@ import { AppService } from './app.service';
 import { ToursModule } from './tours/tours.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { UsersModule } from './users/users.module';
-import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { JwtModule } from '@nestjs/jwt';
-import { config } from 'dotenv';
 import { MailModule } from './mail/mail.module';
 
 @Module({
@@ -40,6 +38,8 @@ import { MailModule } from './mail/mail.module';
       provide: APP_PIPE,
       useValue: new ValidationPipe({
         whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
       }),
     },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

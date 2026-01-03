@@ -1,8 +1,28 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import slugify from 'slugify';
-
+import { Types } from 'mongoose';
+import { User } from 'src/users/schemas/user.schema';
 export type TourDocument = HydratedDocument<Tour>;
+
+enum Difficulty {
+  EASY = 'easy',
+  MEDIUM = 'medium',
+  DIFFICULT = 'difficult',
+}
+
+enum GeoType {
+  POINT = 'Point',
+}
+
+export type GeoLocation = {
+  type: GeoType;
+  coordinates: number[];
+  address?: string;
+  description?: string;
+};
+
+export type Location = GeoLocation & { day?: number };
 
 @Schema({
   timestamps: true,
@@ -29,13 +49,13 @@ export class Tour {
   price: number;
 
   @Prop()
-  priceDiscount: number;
+  priceDiscount?: number;
 
   @Prop({ required: true })
   maxGroupSize: number;
 
-  @Prop({ required: true, enum: ['easy', 'medium', 'difficult'] })
-  difficulty: string;
+  @Prop({ required: true, enum: Difficulty })
+  difficulty: Difficulty;
 
   @Prop()
   slug: string;
@@ -58,12 +78,30 @@ export class Tour {
   @Prop({ required: true })
   startDates: Date[];
 
-  @Prop()
-  passwordChangedAt: Date;
+  @Prop({
+    type: { type: String, enum: [GeoType.POINT], default: 'Point' },
+    coordinates: [Number],
+    address: String,
+    description: String,
+  })
+  startLocation: GeoLocation;
+  @Prop([
+    {
+      type: { type: String, enum: [GeoType.POINT], default: 'Point' },
+      coordinates: [Number],
+      address: String,
+      description: String,
+      day: Number,
+    },
+  ])
+  locations: Location[];
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
+  guides: (User | string)[];
 }
 
 export const TourSchema = SchemaFactory.createForClass(Tour);
-
+TourSchema.index({ startLocation: '2dsphere' });
 //Document Middleware
 TourSchema.pre<TourDocument>('save', function (this: TourDocument) {
   this.slug = slugify(this.name, { lower: true });

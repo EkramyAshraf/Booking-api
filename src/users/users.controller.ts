@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -27,6 +28,8 @@ import { CurrentUser } from './auth/decorators/currentUser.decorator';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
 import { SetCookieInterceptor } from 'src/interceptors/set-cookie.interceptor';
+import { Roles } from './auth/decorators/roles.decorator';
+import { RoleGuards } from './auth/guards/roles.guard';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -92,5 +95,16 @@ export class UsersController {
   @HttpCode(204)
   async deleteMe(@CurrentUser() user: any) {
     return await this.userService.deleteMe(user.id);
+  }
+
+  @Get('/')
+  @Roles('admin')
+  @UseGuards(AuthGuard, RoleGuards)
+  @UseGuards(AuthGuard)
+  async getAllUsers() {
+    const users = await this.userService.find();
+    return {
+      users,
+    };
   }
 }

@@ -15,7 +15,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const nodeEnv = this.configService.get<string>('NODE_ENV');
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>() as any;
+    const response = ctx.getResponse<Response>();
 
     //get basic status code
     let statusCode =
@@ -27,6 +27,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let message = exception.message || 'Something went very wrong!';
 
     if (nodeEnv === 'production') {
+      if (exception.name === 'ValidationError') {
+        statusCode = 400;
+        const errors = Object.values(exception.errors).map(
+          (el: any) => el.message,
+        );
+        message = `Invalid input data. ${errors.join('. ')}`;
+      }
       //validation pipe errors
       if (exception instanceof BadRequestException) {
         let resBody = exception.getResponse() as any;
@@ -47,12 +54,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
 
       if (exception.name === 'JsonWebTokenError') {
-        statusCode = 400;
+        statusCode = 401;
         message = 'Invalid login, please login again!';
       }
 
       if (exception.name === 'TokenExpiredError') {
-        statusCode = 400;
+        statusCode = 401;
         message = 'your token has been Expired, please login again!';
       }
     }

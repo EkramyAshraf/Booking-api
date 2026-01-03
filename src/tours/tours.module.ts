@@ -8,6 +8,7 @@ import { UsersModule } from 'src/users/users.module';
   imports: [
     UsersModule,
     MongooseModule.forFeature([{ name: Tour.name, schema: TourSchema }]),
+    UsersModule,
   ],
   controllers: [ToursController],
   providers: [ToursService],

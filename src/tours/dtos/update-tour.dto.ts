@@ -5,21 +5,30 @@ import {
   IsOptional,
   Min,
   Max,
-  IsArray,
-  IsDate,
-  IsEnum,
   MaxLength,
   MinLength,
+  IsEnum,
+  IsArray,
+  IsDate,
+  ValidateNested,
 } from 'class-validator';
-export class UpdateToursDto {
+import { LocationDto, StartLocationDto } from './geo-locations.dto';
+
+enum Difficulty {
+  EASY = 'easy',
+  MEDIUM = 'medium',
+  DIFFICULT = 'difficult',
+}
+
+export class UpdateTourDto {
   @IsOptional()
   @IsString()
   @MaxLength(40)
   @MinLength(10)
   name: string;
 
-  @IsNumber()
   @IsOptional()
+  @IsNumber()
   @Max(5)
   @Min(1)
   ratingsAverage: number;
@@ -28,8 +37,12 @@ export class UpdateToursDto {
   @IsNumber()
   price: number;
 
-  @IsNumber()
   @IsOptional()
+  @IsNumber()
+  priceDiscount: number;
+
+  @IsOptional()
+  @IsNumber()
   ratingsQuantity: number;
 
   @IsOptional()
@@ -42,8 +55,8 @@ export class UpdateToursDto {
 
   @IsOptional()
   @IsString()
-  @IsEnum(['easy', 'medium', 'difficult'])
-  difficulty: string;
+  @IsEnum(Difficulty)
+  difficulty: Difficulty;
 
   @IsOptional()
   @IsString()
@@ -70,4 +83,20 @@ export class UpdateToursDto {
   @Type(() => Date)
   @IsDate({ each: true })
   startDates: Date[];
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => StartLocationDto)
+  startLocation?: StartLocationDto;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => LocationDto)
+  locations?: LocationDto[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  guides?: string[];
 }

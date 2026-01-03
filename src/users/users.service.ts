@@ -14,6 +14,9 @@ export class UsersService {
     return this.userModel.create(dto);
   }
 
+  async find() {
+    return await this.userModel.find();
+  }
   async findOne(dto: SigninDto) {
     return await this.userModel
       .findOne({ email: dto.email })
