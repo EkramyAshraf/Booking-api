@@ -22,14 +22,15 @@ import { ForgotPasswordDto } from './dtos/forgot-password.dto';
 import express from 'express';
 import { ResetUserPasswordDto } from './dtos/reset-password.dto';
 import { UpdateUserPasswordDto } from './dtos/update-password.dto';
-import { AuthGuard } from './auth/guards/auth.guard';
+
 import { User } from './schemas/user.schema';
 import { CurrentUser } from './auth/decorators/currentUser.decorator';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UsersService } from './users.service';
 import { SetCookieInterceptor } from 'src/interceptors/set-cookie.interceptor';
-import { Roles } from './auth/decorators/roles.decorator';
-import { RoleGuards } from './auth/guards/roles.guard';
+import { Roles } from '../users/auth/decorators/roles.decorator';
+import { RoleGuards } from '../guards/roles.guard';
+import { AuthGuard } from '../guards/auth.guard';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -46,6 +47,7 @@ export class UsersController {
     return { ...user.toObject(), token };
   }
 
+  @UseInterceptors(SetCookieInterceptor)
   @Serialize(UserDto)
   @Post('/login')
   @HttpCode(HttpStatus.OK)

@@ -12,9 +12,9 @@ import {
 import { ToursService } from './tours.service';
 import { CreateTourDto } from './dtos/create-tour.dto';
 import { UpdateTourDto } from './dtos/update-tour.dto';
-import { AuthGuard } from '../users/auth/guards/auth.guard';
-import { Roles } from 'src/users/auth/decorators/roles.decorator';
-import { RoleGuards } from 'src/users/auth/guards/roles.guard';
+import { Roles } from '../users/auth/decorators/roles.decorator';
+import { RoleGuards } from '../guards/roles.guard';
+import { AuthGuard } from '../guards/auth.guard';
 
 @Controller('api/v1/tours')
 export class ToursController {

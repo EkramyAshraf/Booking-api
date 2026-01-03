@@ -12,5 +12,6 @@ import { UsersModule } from 'src/users/users.module';
   ],
   controllers: [ToursController],
   providers: [ToursService],
+  exports: [MongooseModule, ToursService],
 })
 export class ToursModule {}
