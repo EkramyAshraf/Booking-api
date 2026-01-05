@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 
 export class UserDto {
   @Expose()
@@ -10,7 +10,8 @@ export class UserDto {
   email: string;
 
   @Expose()
-  _id: string;
+  @Transform(({ obj }) => obj._id?.toString() || obj.id)
+  id: string;
 
   @Expose()
   createdAt: Date;

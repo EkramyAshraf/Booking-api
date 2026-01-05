@@ -8,8 +8,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  @InjectModel(User.name) private userModel: Model<UserDocument>;
-
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
   async createUser(dto: CreateUserDto) {
     return this.userModel.create(dto);
   }
@@ -17,6 +16,7 @@ export class UsersService {
   async find() {
     return await this.userModel.find();
   }
+
   async findOne(dto: SigninDto) {
     return await this.userModel
       .findOne({ email: dto.email })
@@ -58,4 +58,6 @@ export class UsersService {
       data: null,
     };
   }
+
+  async getMe() {}
 }

@@ -5,7 +5,6 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CookieOptions } from 'express';
 import { UsersService } from '../users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../dtos/create-user.dto';
@@ -16,8 +15,6 @@ import { MailService } from 'src/mail/mail.service';
 import * as crypto from 'crypto';
 import { ResetUserPasswordDto } from '../dtos/reset-password.dto';
 import { UpdateUserPasswordDto } from '../dtos/update-password.dto';
-import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
 @Injectable()
 export class AuthService {
   constructor(
@@ -31,7 +28,7 @@ export class AuthService {
     const token = await this.jwtService.signAsync({ id: user._id });
 
     return {
-      user,
+      ...user.toObject(),
       token,
     };
   }
@@ -43,7 +40,7 @@ export class AuthService {
       throw new UnauthorizedException('Incorrect email or password');
     }
     const token = await this.jwtService.signAsync({ id: user._id });
-    return { user, token };
+    return { ...user.toObject(), token };
   }
 
   async forgotPassword(dto: ForgotPasswordDto, host: string, protocol: string) {

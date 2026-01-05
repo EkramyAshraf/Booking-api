@@ -6,56 +6,40 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Tour, TourDocument } from './schemas/tour.schema';
 import { Model, Types } from 'mongoose';
-import { ApiFeatures } from '../utils/api-features';
+import { ApiFeatures } from '../common/utils/api-features';
 import { CreateTourDto } from './dtos/create-tour.dto';
+import { QueryDto } from 'src/common/dtos/query.dto';
+import { BaseService } from 'src/common/base/base.service';
+import { UpdateTourDto } from './dtos/update-tour.dto';
 
 @Injectable()
-export class ToursService {
-  constructor(@InjectModel(Tour.name) private tourModel: Model<TourDocument>) {}
+export class ToursService extends BaseService<TourDocument> {
+  constructor(@InjectModel(Tour.name) private tourModel: Model<TourDocument>) {
+    super(tourModel);
+  }
 
-  async getAllTours(queryString: any): Promise<TourDocument[]> {
-    const features = new ApiFeatures(this.tourModel.find(), queryString)
-      .filter()
-      .limitFields()
-      .sort()
-      .paginate();
-    return await features.query;
+  async getAllTours(queryString: any): Promise<any> {
+    return await this.findAll(queryString);
   }
 
   async createTour(data: Partial<TourDocument>) {
-    const tour = await this.tourModel.create(data);
-    if (tour.priceDiscount !== undefined && tour.priceDiscount >= tour.price) {
-      throw new BadRequestException('price must be greater than priceDiscount');
-    }
-    return tour;
+    return await this.create(data);
   }
 
-  async getTour(id: string): Promise<TourDocument> {
-    const tour = await this.tourModel
-      .findById(id)
-      .populate({ path: 'guides', select: 'name email role' });
-    if (!tour) {
-      throw new NotFoundException('tour is not found with this id');
-    }
-    return tour;
+  async getTour(id: string): Promise<any> {
+    return await this.findOne(
+      id,
+      { path: 'guides', select: 'name email role' },
+      'reviews',
+    );
   }
 
-  async updateTour(
-    id: string,
-    data: Partial<TourDocument>,
-  ): Promise<TourDocument> {
-    const tour = await this.tourModel.findByIdAndUpdate(id, data, {
-      new: true,
-      runValidators: true,
-    });
-    if (!tour) {
-      throw new NotFoundException('tour is not found with this id');
-    }
-    return tour;
+  async updateTour(id: string, data: UpdateTourDto): Promise<any> {
+    return this.update(id, data);
   }
 
-  async deleteTour(id: string): Promise<TourDocument | null> {
-    return await this.tourModel.findByIdAndDelete(id);
+  async deleteTour(id: string): Promise<any | null> {
+    return await this.delete(id);
   }
 
   async getTourStats() {

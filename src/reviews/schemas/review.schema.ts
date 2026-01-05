@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
-import path from 'path';
+import { HydratedDocument, Model, model, Types } from 'mongoose';
 import { Tour } from 'src/tours/schemas/tour.schema';
 import { User } from 'src/users/schemas/user.schema';
 
@@ -18,20 +17,10 @@ export class Review {
   rating: number;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'Tour' })
-  tour: Tour | string;
+  tour: Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  user: User | string;
+  user: Types.ObjectId;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);
-
-ReviewSchema.pre(/^find/, async function (this: any) {
-  this.populate({
-    path: 'tour',
-    select: 'name',
-  }).populate({
-    path: 'user',
-    select: 'name photo',
-  });
-});

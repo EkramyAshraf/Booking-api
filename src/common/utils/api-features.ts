@@ -1,5 +1,6 @@
 import * as qs from 'qs';
 import { Query } from 'mongoose';
+import { QueryDto } from '../dtos/query.dto';
 
 export class ApiFeatures<T> {
   constructor(
@@ -20,7 +21,7 @@ export class ApiFeatures<T> {
 
   sort() {
     if (this.queryString.sort) {
-      let sortBy: any;
+      let sortBy: string;
       if (typeof this.queryString.sort === 'string') {
         sortBy = this.queryString.sort.split(',').join(' ');
         this.query = this.query.sort(sortBy);
@@ -45,8 +46,8 @@ export class ApiFeatures<T> {
   }
 
   paginate() {
-    const limit = this.queryString.limit * 1 || 100;
-    const page = this.queryString.page * 1 || 1;
+    const limit = Number(this.queryString.limit) || 100;
+    const page = Number(this.queryString.page) || 1;
     const skip = (page - 1) * limit;
     this.query = this.query.skip(skip).limit(limit);
     return this;

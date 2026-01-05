@@ -101,6 +101,8 @@ export class Tour {
 }
 
 export const TourSchema = SchemaFactory.createForClass(Tour);
+TourSchema.index({ price: 1, ratingsAverage: -1 });
+TourSchema.index({ slug: 1 });
 TourSchema.index({ startLocation: '2dsphere' });
 //Document Middleware
 TourSchema.pre<TourDocument>('save', function (this: TourDocument) {
@@ -109,4 +111,10 @@ TourSchema.pre<TourDocument>('save', function (this: TourDocument) {
 
 TourSchema.virtual('durationWeeks').get(function (this: TourDocument) {
   return Math.round(this.duration / 7);
+});
+
+TourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
 });

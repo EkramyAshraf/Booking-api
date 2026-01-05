@@ -9,7 +9,6 @@ import {
   Patch,
   Post,
   Req,
-  Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -31,6 +30,7 @@ import { SetCookieInterceptor } from 'src/interceptors/set-cookie.interceptor';
 import { Roles } from '../users/auth/decorators/roles.decorator';
 import { RoleGuards } from '../guards/roles.guard';
 import { AuthGuard } from '../guards/auth.guard';
+import { serialize } from 'v8';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -39,24 +39,24 @@ export class UsersController {
     private userService: UsersService,
   ) {}
 
+  @Post('/signup')
+  @HttpCode(201)
   @UseInterceptors(SetCookieInterceptor)
   @Serialize(UserDto)
-  @Post('/signup')
   async signup(@Body() body: CreateUserDto) {
-    const { user, token } = await this.authService.signup(body);
-    return { ...user.toObject(), token };
+    return await this.authService.signup(body);
   }
 
-  @UseInterceptors(SetCookieInterceptor)
-  @Serialize(UserDto)
   @Post('/login')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(SetCookieInterceptor)
+  @Serialize(UserDto)
   async login(@Body() body: SigninDto) {
-    const { user, token } = await this.authService.login(body);
-    return { ...user.toObject(), token };
+    return await this.authService.login(body);
   }
 
   @Post('/forgotPassword')
+  @HttpCode(201)
   async forgotPassword(
     @Body() body: ForgotPasswordDto,
     @Req() req: express.Request,
@@ -66,8 +66,9 @@ export class UsersController {
     return await this.authService.forgotPassword(body, host, protocol);
   }
 
-  @Serialize(UserDto)
   @Patch('/resetPassword/:tokenParam')
+  @UseInterceptors(SetCookieInterceptor)
+  @Serialize(UserDto)
   async resetPassword(
     @Param('tokenParam') tokenParam: string,
     @Body() body: ResetUserPasswordDto,
@@ -76,7 +77,9 @@ export class UsersController {
   }
 
   @Patch('/updateMyPassword')
-  @UseGuards(AuthGuard)
+  @Roles('user')
+  @UseGuards(AuthGuard, RoleGuards)
+  @UseInterceptors(SetCookieInterceptor)
   @Serialize(UserDto)
   async updatePassword(
     @CurrentUser() user: any,
@@ -86,27 +89,36 @@ export class UsersController {
   }
 
   @Patch('/updateMe')
-  @UseGuards(AuthGuard)
+  @Roles('admin', 'user')
+  @UseGuards(AuthGuard, RoleGuards)
   @Serialize(UserDto)
   async updateMe(@CurrentUser() user: any, @Body() body: UpdateUserDto) {
     return await this.userService.updateMe(body, user.id);
   }
 
-  @Delete('/deleteMe')
   @UseGuards(AuthGuard)
+  @Delete('/deleteMe')
   @HttpCode(204)
   async deleteMe(@CurrentUser() user: any) {
     return await this.userService.deleteMe(user.id);
   }
 
-  @Get('/')
   @Roles('admin')
   @UseGuards(AuthGuard, RoleGuards)
-  @UseGuards(AuthGuard)
+  @Get('/')
+  @Serialize(UserDto)
   async getAllUsers() {
     const users = await this.userService.find();
     return {
       users,
     };
+  }
+
+  @Roles('admin', 'user')
+  @UseGuards(AuthGuard, RoleGuards)
+  @Get('/me')
+  @Serialize(UserDto)
+  async getMe(@CurrentUser() user: any) {
+    return user;
   }
 }

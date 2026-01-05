@@ -1,5 +1,13 @@
-import { IsString, IsNumber, Min, Max } from 'class-validator';
-
+import { Transform } from 'class-transformer';
+import {
+  IsString,
+  IsNumber,
+  Min,
+  Max,
+  IsDefined,
+  IsOptional,
+} from 'class-validator';
+import { Types } from 'mongoose';
 export class CreateReviewDto {
   @IsString()
   review: string;
@@ -9,9 +17,13 @@ export class CreateReviewDto {
   @Min(1)
   rating: number;
 
-  @IsString()
-  tour: string;
+  @IsOptional()
+  @IsDefined()
+  @Transform(({ value }) => new Types.ObjectId(value))
+  tour: any;
 
-  @IsString()
-  user: string;
+  @IsOptional()
+  @IsDefined()
+  @Transform(({ value }) => new Types.ObjectId(value))
+  user: any;
 }

@@ -41,7 +41,6 @@ import { ReviewsModule } from './reviews/reviews.module';
       useValue: new ValidationPipe({
         whitelist: true,
         transform: true,
-        forbidNonWhitelisted: true,
       }),
     },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
