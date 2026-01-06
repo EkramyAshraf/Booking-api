@@ -20,6 +20,9 @@ export class UserDto {
   token: string;
 
   @Expose()
+  photo: string;
+
+  @Expose()
   message: string;
 
   @Expose()

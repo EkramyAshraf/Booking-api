@@ -10,6 +10,8 @@ import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { MailModule } from './mail/mail.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { BookingModule } from './booking/booking.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { ReviewsModule } from './reviews/reviews.module';
     UsersModule,
     MailModule,
     ReviewsModule,
+    BookingModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [

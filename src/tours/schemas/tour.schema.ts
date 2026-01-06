@@ -46,16 +46,16 @@ export class Tour {
   })
   ratingsAverage: number;
 
-  @Prop({ required: true })
+  @Prop()
   duration: number;
 
-  @Prop({ required: true })
+  @Prop()
   price: number;
 
   @Prop()
   priceDiscount?: number;
 
-  @Prop({ required: true })
+  @Prop()
   maxGroupSize: number;
 
   @Prop({ required: true, enum: Difficulty })
@@ -82,23 +82,23 @@ export class Tour {
   @Prop({ required: true })
   startDates: Date[];
 
-  @Prop({
-    type: { type: String, enum: [GeoType.POINT], default: 'Point' },
-    coordinates: [Number],
-    address: String,
-    description: String,
-  })
-  startLocation: GeoLocation;
-  @Prop([
-    {
-      type: { type: String, enum: [GeoType.POINT], default: 'Point' },
-      coordinates: [Number],
-      address: String,
-      description: String,
-      day: Number,
-    },
-  ])
-  locations: Location[];
+  // @Prop({
+  //   type: { type: String, enum: [GeoType.POINT], default: 'Point' },
+  //   coordinates: [Number],
+  //   address: String,
+  //   description: String,
+  // })
+  // startLocation: GeoLocation;
+  // @Prop([
+  //   {
+  //     type: { type: String, enum: [GeoType.POINT], default: 'Point' },
+  //     coordinates: [Number],
+  //     address: String,
+  //     description: String,
+  //     day: Number,
+  //   },
+  // ])
+  // locations: Location[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
   guides: (Types.ObjectId | string)[];

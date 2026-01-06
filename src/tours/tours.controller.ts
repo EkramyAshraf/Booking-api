@@ -9,8 +9,9 @@ import {
   Query,
   UseGuards,
   HttpCode,
-  UsePipes,
-  ValidationPipe,
+  UseInterceptors,
+  UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import { ToursService } from './tours.service';
 import { CreateTourDto } from './dtos/create-tour.dto';
@@ -23,6 +24,9 @@ import { CreateReviewDto } from 'src/reviews/dtos/create-review.dto';
 import { ReviewsService } from 'src/reviews/reviews.service';
 import { QueryDto } from 'src/common/dtos/query.dto';
 import { Types } from 'mongoose';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+import { SharpPipe } from 'src/pipes/sharp.pipe';
 
 @Controller('api/v1/tours')
 export class ToursController {
@@ -40,7 +44,21 @@ export class ToursController {
   @Roles('admin', 'lead-guide')
   @UseGuards(AuthGuard, RoleGuards)
   @HttpCode(201)
-  async createTour(@Body() body: CreateTourDto) {
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'imageCover', maxCount: 1 },
+        { name: 'images', maxCount: 3 },
+      ],
+      { storage: memoryStorage() },
+    ),
+  )
+  async createTour(
+    @UploadedFiles(SharpPipe) imageNames: any,
+    @Body() body: CreateTourDto,
+  ) {
+    if (imageNames.imageCover) body.imageCover = imageNames.imageCover;
+    if (imageNames.images) body.images = imageNames.images;
     return await this.toursService.createTour(body);
   }
 
@@ -80,7 +98,23 @@ export class ToursController {
   @Roles('admin', 'lead-guide')
   @UseGuards(AuthGuard, RoleGuards)
   @HttpCode(201)
-  async updateTour(@Param('id') id: string, @Body() body: UpdateTourDto) {
+  @HttpCode(201)
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'imageCover', maxCount: 1 },
+        { name: 'images', maxCount: 3 },
+      ],
+      { storage: memoryStorage() },
+    ),
+  )
+  async updateTour(
+    @UploadedFiles(SharpPipe) imageNames: any,
+    @Param('id') id: string,
+    @Body() body: UpdateTourDto,
+  ) {
+    if (imageNames.imageCover) body.imageCover = imageNames.imageCover;
+    if (imageNames.images) body.images = imageNames.images;
     return await this.toursService.updateTour(id, body);
   }
 

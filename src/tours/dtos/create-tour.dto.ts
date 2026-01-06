@@ -32,6 +32,7 @@ export class CreateTourDto {
   @Min(1)
   ratingsAverage: number;
 
+  @IsOptional()
   @IsNumber()
   price: number;
 
@@ -43,9 +44,11 @@ export class CreateTourDto {
   @IsNumber()
   ratingsQuantity: number;
 
+  @IsOptional()
   @IsNumber()
   duration: number;
 
+  @IsOptional()
   @IsNumber()
   maxGroupSize: number;
 
@@ -59,9 +62,11 @@ export class CreateTourDto {
   @IsString()
   description: string;
 
+  @IsOptional()
   @IsString()
   imageCover: string;
 
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   images: string[];
@@ -69,6 +74,7 @@ export class CreateTourDto {
   @IsOptional()
   slug: string;
 
+  @IsOptional()
   @IsArray()
   @Type(() => Date)
   @IsDate({ each: true })

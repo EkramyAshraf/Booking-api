@@ -7,9 +7,20 @@ import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import mongoSanitizer from 'mongo-sanitizer';
 import hpp from 'hpp';
+import express from 'express';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bodyParser: true,
+  });
+
+  app.use(
+    '/api/v1/payments/webhook-checkout',
+    express.raw({ type: 'application/json' }),
+  );
 
   app.use(helmet());
   app.use(mongoSanitizer());
@@ -41,6 +52,8 @@ async function bootstrap() {
   if (configService.get('NODE_ENV') === 'development') {
     app.use(morgan('dev'));
   }
+
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

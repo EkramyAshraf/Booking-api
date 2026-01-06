@@ -10,6 +10,7 @@ import {
   Post,
   Req,
   Res,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -32,6 +33,10 @@ import { SetCookieInterceptor } from 'src/interceptors/set-cookie.interceptor';
 import { Roles } from '../users/auth/decorators/roles.decorator';
 import { RoleGuards } from '../guards/roles.guard';
 import { AuthGuard } from '../guards/auth.guard';
+import { LogoutInterceptor } from 'src/interceptors/logout.interceptor';
+import { SharpPipe } from 'src/pipes/sharp.pipe';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -42,9 +47,18 @@ export class UsersController {
 
   @Post('/signup')
   @HttpCode(201)
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'photo', maxCount: 1 }], {
+      storage: memoryStorage(),
+    }),
+  )
   @UseInterceptors(SetCookieInterceptor)
   @Serialize(UserDto)
-  async signup(@Body() body: CreateUserDto) {
+  async signup(
+    @UploadedFiles(SharpPipe) imageNames: any,
+    @Body() body: CreateUserDto,
+  ) {
+    if (imageNames.photo) body.photo = imageNames.photo;
     return await this.authService.signup(body);
   }
 
@@ -92,8 +106,18 @@ export class UsersController {
   @Patch('/updateMe')
   @Roles('admin', 'user')
   @UseGuards(AuthGuard, RoleGuards)
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'photo', maxCount: 1 }], {
+      storage: memoryStorage(),
+    }),
+  )
   @Serialize(UserDto)
-  async updateMe(@CurrentUser() user: any, @Body() body: UpdateUserDto) {
+  async updateMe(
+    @UploadedFiles(SharpPipe) imageNames: any,
+    @CurrentUser() user: any,
+    @Body() body: UpdateUserDto,
+  ) {
+    if (imageNames.photo) body.photo = imageNames.photo;
     return await this.userService.updateMe(body, user.id);
   }
 
@@ -124,12 +148,8 @@ export class UsersController {
   }
 
   @Get('/logout')
-  logout(@Res({ passthrough: true }) res: express.Response) {
-    res.cookie('jwt', 'loggedout', {
-      httpOnly: true,
-      expires: new Date(Date.now() + 10 * 1000),
-    });
-
-    return { status: 'success' };
+  @UseInterceptors(LogoutInterceptor)
+  async logout() {
+    return await this.authService.logout();
   }
 }

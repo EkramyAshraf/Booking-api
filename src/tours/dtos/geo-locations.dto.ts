@@ -15,6 +15,7 @@ export class StartLocationDto {
   @IsEnum(GeoType)
   type: GeoType;
 
+  @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true })
   @Type(() => Number)
