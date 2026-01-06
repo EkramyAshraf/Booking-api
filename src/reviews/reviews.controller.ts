@@ -51,6 +51,6 @@ export class ReviewsController {
   @Delete('/:id')
   @HttpCode(204)
   async deleteReview(@Param('id') id: string) {
-    return await this.reviewsService.delete(id);
+    return await this.reviewsService.deleteReview(id);
   }
 }

@@ -97,7 +97,7 @@ export class Tour {
   locations: Location[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
-  guides: (User | string)[];
+  guides: (Types.ObjectId | string)[];
 }
 
 export const TourSchema = SchemaFactory.createForClass(Tour);

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model, model, Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import { Tour } from 'src/tours/schemas/tour.schema';
 import { User } from 'src/users/schemas/user.schema';
 
@@ -24,3 +24,10 @@ export class Review {
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);
+
+ReviewSchema.pre(/^find/, async function (this: any) {
+  this.populate({
+    path: 'user',
+    select: 'name photo',
+  });
+});

@@ -22,6 +22,7 @@ import { CurrentUser } from 'src/users/auth/decorators/currentUser.decorator';
 import { CreateReviewDto } from 'src/reviews/dtos/create-review.dto';
 import { ReviewsService } from 'src/reviews/reviews.service';
 import { QueryDto } from 'src/common/dtos/query.dto';
+import { Types } from 'mongoose';
 
 @Controller('api/v1/tours')
 export class ToursController {
@@ -100,10 +101,9 @@ export class ToursController {
   ) {
     const finalReviewData = {
       ...body,
-      tour: tourId,
+      tour: new Types.ObjectId(tourId),
       user: user._id,
     };
-
     return await this.reviewsService.createReview(finalReviewData);
   }
 
