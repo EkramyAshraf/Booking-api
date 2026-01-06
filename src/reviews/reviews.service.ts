@@ -73,11 +73,9 @@ export class ReviewsService extends BaseService<ReviewDocument> {
       },
     ]);
 
-    console.log(result);
-
     if (result.length > 0) {
       await this.tourModel.findByIdAndUpdate(tourId, {
-        ratingsAverage: result[0].avgRating,
+        ratingsAverage: Math.round(result[0].avgRating * 10) / 10,
         ratingsQuantity: result[0].ratingQuantity,
       });
     } else {

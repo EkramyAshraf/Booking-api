@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Req,
+  Res,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ import { UserDto } from './dtos/user.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { SigninDto } from './dtos/signin.dto';
 import { ForgotPasswordDto } from './dtos/forgot-password.dto';
+import { Request, Response } from 'express';
 import express from 'express';
 import { ResetUserPasswordDto } from './dtos/reset-password.dto';
 import { UpdateUserPasswordDto } from './dtos/update-password.dto';
@@ -30,7 +32,6 @@ import { SetCookieInterceptor } from 'src/interceptors/set-cookie.interceptor';
 import { Roles } from '../users/auth/decorators/roles.decorator';
 import { RoleGuards } from '../guards/roles.guard';
 import { AuthGuard } from '../guards/auth.guard';
-import { serialize } from 'v8';
 
 @Controller('api/v1/users')
 export class UsersController {
@@ -120,5 +121,15 @@ export class UsersController {
   @Serialize(UserDto)
   async getMe(@CurrentUser() user: any) {
     return user;
+  }
+
+  @Get('/logout')
+  logout(@Res({ passthrough: true }) res: express.Response) {
+    res.cookie('jwt', 'loggedout', {
+      httpOnly: true,
+      expires: new Date(Date.now() + 10 * 1000),
+    });
+
+    return { status: 'success' };
   }
 }

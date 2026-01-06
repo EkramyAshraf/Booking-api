@@ -31,8 +31,12 @@ async function bootstrap() {
     windowMs: 60 * 60 * 1000,
     message: 'Too many requests from this IP, please try again in an hour!',
   });
-  app.use('/api', limiter);
 
+  app.use('/api', limiter);
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
   const configService = app.get(ConfigService);
   if (configService.get('NODE_ENV') === 'development') {
     app.use(morgan('dev'));

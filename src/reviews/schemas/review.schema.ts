@@ -25,6 +25,8 @@ export class Review {
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);
 
+ReviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 ReviewSchema.pre(/^find/, async function (this: any) {
   this.populate({
     path: 'user',

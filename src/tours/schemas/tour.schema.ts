@@ -39,7 +39,11 @@ export class Tour {
   })
   name: string;
 
-  @Prop({ default: 4.5, min: 1, max: 5 })
+  @Prop({
+    default: 4.5,
+    min: 1,
+    max: 5,
+  })
   ratingsAverage: number;
 
   @Prop({ required: true })
@@ -104,6 +108,7 @@ export const TourSchema = SchemaFactory.createForClass(Tour);
 TourSchema.index({ price: 1, ratingsAverage: -1 });
 TourSchema.index({ slug: 1 });
 TourSchema.index({ startLocation: '2dsphere' });
+
 //Document Middleware
 TourSchema.pre<TourDocument>('save', function (this: TourDocument) {
   this.slug = slugify(this.name, { lower: true });

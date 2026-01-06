@@ -129,4 +129,8 @@ export class AuthService {
       token,
     };
   }
+
+  async logout() {
+    return { status: 'success' };
+  }
 }
